@@ -1,12 +1,37 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\anton\\source\\repos\\EventNegotiation\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{69682223-24D2-48A4-958D-A1B1F35FADAB}|EventNegotiation.csproj|c:\\users\\anton\\source\\repos\\eventnegotiation\\data\\contexo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{69682223-24D2-48A4-958D-A1B1F35FADAB}|EventNegotiation.csproj|solutionrelative:data\\contexo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Contexo.cs",
+              "DocumentMoniker": "C:\\Users\\anton\\source\\repos\\EventNegotiation\\Data\\Contexo.cs",
+              "RelativeDocumentMoniker": "Data\\Contexo.cs",
+              "ToolTip": "C:\\Users\\anton\\source\\repos\\EventNegotiation\\Data\\Contexo.cs",
+              "RelativeToolTip": "Data\\Contexo.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-14T21:40:25.041Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

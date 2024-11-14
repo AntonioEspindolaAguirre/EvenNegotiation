@@ -17,6 +17,10 @@ namespace EventNegotiation.Controllers
         {
             return View();
         }
+        public IActionResult Registrar()
+        {
+            return View();
+        }
 
         public IActionResult Privacy()
         {
