@@ -1,0 +1,46 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pantalla de Splash</title>
+    <style>
+        /* Estilos para la pantalla splash */
+        body {
+            background-color: #2C3E50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .splash-container {
+            text-align: center;
+        }
+
+        .splash-text {
+            font-size: 30px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="splash-container">
+        <div class="splash-text">Bienvenido a nuestra aplicación</div>
+        <div>Redirigiendo...</div>
+    </div>
+
+    <script>
+        // Redirige al usuario después de 3 segundos (3000 ms)
+        setTimeout(function () {
+            window.location.href = '/Home/Index';  // Ajusta la ruta según tu página de inicio
+        }, 3000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+
+@{
+    Layout = "~/Views/Shared/_AdminsLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Bienvenido</h4>
+                <p class="card-description"> @ViewBag.Name  </p>
+                <a href="@Url.Action("CerrarSesion", "Home")" class="btn-close" aria-label="Close"><p>Cerrar Sesión</p> </a>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Eventos</h4>
+                <p class="card-text">Consulta y administra tus eventos programados. Mantente al día con las actividades importantes.</p>
+                <a href="@Url.Action("Eventos", "Admin")" class="btn btn-primary">Ver Eventos</a>
+                <a href="@Url.Action("Usuarios", "Admin")" class="btn btn-success">Agregar Usuarios</a>
+            </div>
+        </div>
+    </div>
+
+</div>

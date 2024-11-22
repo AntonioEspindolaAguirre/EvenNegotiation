@@ -1,0 +1,180 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+@{
+    Layout = "~/Views/Shared/_AdminsLayout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Usuario</title>
+    <!-- Aquí puedes agregar Bootstrap o tu framework CSS preferido -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Formulario de Registro -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Registrar Usuario</h4>
+                        <form id="registrationForm">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Nombre de Usuario</label>
+                                <input type="text" class="form-control" id="username" placeholder="Nombre de Usuario" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Correo Electrónico</label>
+                                <input type="email" class="form-control" id="email" placeholder="Correo Electrónico" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="password" placeholder="Contraseña" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
+                                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirmar Contraseña" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Registrar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Usuarios -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Usuarios Registrados</h4>
+                        <ul id="userIdsList" class="list-group">
+                            <!-- Los IDs de usuarios registrados aparecerán aquí -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar IndexedDB
+        const initDB = () => {
+            const request = indexedDB.open('usuariosDB', 1);
+
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('usuarios')) {
+                    db.createObjectStore('usuarios', { keyPath: 'email' });
+                }
+            };
+
+            request.onsuccess = (event) => {
+                const db = event.target.result;
+                fetchUsers(db);
+            };
+
+            request.onerror = (event) => {
+                console.error('Error al abrir la base de datos:', event.target.errorCode);
+            };
+        };
+
+        // Función para guardar usuario en IndexedDB
+        const saveUser = (userData) => {
+            const request = indexedDB.open('usuariosDB', 1);
+
+            request.onsuccess = (event) => {
+                const db = event.target.result;
+                const transaction = db.transaction('usuarios', 'readwrite');
+                const usuariosStore = transaction.objectStore('usuarios');
+
+                const addRequest = usuariosStore.add(userData);
+
+                addRequest.onsuccess = () => {
+                    sendNotification('Usuario Registrado', `El usuario ${userData.nombre} ha sido registrado exitosamente.`);
+                    addUserIdToList(userData.email); // Agregar ID (email) a la lista
+                };
+
+                addRequest.onerror = (error) => {
+                    if (error.target.error.name === 'ConstraintError') {
+                        alert('Este correo ya está registrado. Usa otro.');
+                    } else {
+                        console.error('Error al guardar el usuario:', error.target.error);
+                    }
+                };
+            };
+        };
+
+        // Función para agregar ID a la lista en la página
+        const addUserIdToList = (id) => {
+            const userIdsList = document.getElementById('userIdsList');
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item';
+            listItem.textContent = id; // Mostrar el ID (email en este caso)
+            userIdsList.appendChild(listItem);
+        };
+
+        // Función para cargar usuarios ya registrados
+        const fetchUsers = (db) => {
+            const transaction = db.transaction('usuarios', 'readonly');
+            const usuariosStore = transaction.objectStore('usuarios');
+            const request = usuariosStore.getAll();
+
+            request.onsuccess = () => {
+                const users = request.result;
+                users.forEach(user => addUserIdToList(user.email));
+            };
+
+            request.onerror = (error) => {
+                console.error('Error al cargar usuarios:', error.target.error);
+            };
+        };
+
+        // Función para enviar la notificación push
+        const sendNotification = (title, message) => {
+            if (Notification.permission === 'granted') {
+                new Notification(title, {
+                    body: message,
+                    icon: '/img/favicon.png',
+                    badge: '/img/favicon.png'
+                });
+            } else {
+                console.log('Permiso para notificaciones no concedido');
+            }
+        };
+
+        // Manejo del formulario de registro de usuario
+        document.getElementById('registrationForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (password !== document.getElementById('confirmPassword').value) {
+                alert('Las contraseñas no coinciden');
+                return;
+            }
+
+            const userData = {
+                nombre: username,
+                email: email,
+                password: password
+            };
+
+            saveUser(userData);
+        });
+
+        // Solicitar permiso para notificaciones
+        if (Notification.permission !== 'granted') {
+            Notification.requestPermission();
+        }
+
+        // Inicializar IndexedDB
+        initDB();
+    </script>
+</body>
+</html>

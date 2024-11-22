@@ -1,6 +1,4 @@
 ﻿namespace EventNegotiation.Data
-{
-    namespace PotaxieSport.Data
     {
         public class Contexto
         {
@@ -13,4 +11,4 @@
         }
     }
 
-}
+

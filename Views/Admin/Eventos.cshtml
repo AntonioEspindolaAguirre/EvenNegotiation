@@ -1,0 +1,181 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminsLayout.cshtml";
+    ViewData["Title"] = "Eventos";
+
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Evento</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+        <div class="row">
+            <!-- Formulario de Registro de Eventos -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Registrar Evento</h4>
+                        <form id="eventForm">
+                            <div class="mb-3">
+                                <label for="eventName" class="form-label">Nombre del Evento</label>
+                                <input type="text" class="form-control" id="eventName" placeholder="Nombre del Evento" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="eventDate" class="form-label">Fecha y Hora</label>
+                                <input type="datetime-local" class="form-control" id="eventDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="eventLocation" class="form-label">Ubicación</label>
+                                <input type="text" class="form-control" id="eventLocation" placeholder="Ubicación" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="eventDescription" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="eventDescription" rows="3" placeholder="Descripción del Evento"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="eventDuration" class="form-label">Duración (HH:MM)</label>
+                                <input type="time" class="form-control" id="eventDuration" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="eventFacilitator" class="form-label">Facilitador</label>
+                                <input type="text" class="form-control" id="eventFacilitator" placeholder="Facilitador" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="eventGuests" class="form-label">Invitados (Correos separados por comas)</label>
+                                <input type="text" class="form-control" id="eventGuests" placeholder="Invitados" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Registrar Evento</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Eventos -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Eventos Registrados</h4>
+                        <ul id="eventList" class="list-group">
+                            <!-- Los eventos registrados aparecerán aquí -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar IndexedDB
+        const initDB = () => {
+            const request = indexedDB.open('eventosDB', 1);
+
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('eventos')) {
+                    db.createObjectStore('eventos', { keyPath: 'id', autoIncrement: true });
+                }
+            };
+
+            request.onerror = (event) => {
+                console.error('Error al abrir la base de datos:', event.target.errorCode);
+            };
+        };
+
+        // Función para guardar un evento en IndexedDB
+        const saveEvent = (eventData) => {
+            const request = indexedDB.open('eventosDB', 1);
+
+            request.onsuccess = (event) => {
+                const db = event.target.result;
+                const transaction = db.transaction('eventos', 'readwrite');
+                const eventosStore = transaction.objectStore('eventos');
+
+                const addRequest = eventosStore.add(eventData);
+
+                addRequest.onsuccess = () => {
+                    sendNotification('Evento Registrado', `El evento "${eventData.nombre}" ha sido registrado exitosamente.`);
+                    addEventToList(eventData);
+                };
+
+                addRequest.onerror = (error) => {
+                    console.error('Error al guardar el evento:', error.target.error);
+                };
+            };
+        };
+
+        // Función para mostrar un evento en la lista
+        const addEventToList = (eventData) => {
+            const eventList = document.getElementById('eventList');
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item';
+            listItem.textContent = `${eventData.nombre} - ${eventData.fecha}`;
+            eventList.appendChild(listItem);
+        };
+
+        // Función para cargar los eventos ya registrados
+        const fetchEvents = () => {
+            const request = indexedDB.open('eventosDB', 1);
+
+            request.onsuccess = (event) => {
+                const db = event.target.result;
+                const transaction = db.transaction('eventos', 'readonly');
+                const eventosStore = transaction.objectStore('eventos');
+                const getAllRequest = eventosStore.getAll();
+
+                getAllRequest.onsuccess = () => {
+                    const events = getAllRequest.result;
+                    events.forEach(eventData => addEventToList(eventData));
+                };
+
+                getAllRequest.onerror = (error) => {
+                    console.error('Error al cargar eventos:', error.target.error);
+                };
+            };
+        };
+
+        // Función para enviar la notificación push
+        const sendNotification = (title, message) => {
+            if (Notification.permission === 'granted') {
+                new Notification(title, {
+                    body: message,
+                    icon: '/img/favicon.png',
+                    badge: '/img/favicon.png'
+                });
+            } else {
+                console.log('Permiso para notificaciones no concedido');
+            }
+        };
+
+        // Manejo del formulario de registro de evento
+        document.getElementById('eventForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const eventData = {
+                nombre: document.getElementById('eventName').value,
+                fecha: document.getElementById('eventDate').value,
+                ubicacion: document.getElementById('eventLocation').value,
+                descripcion: document.getElementById('eventDescription').value,
+                duracion: document.getElementById('eventDuration').value,
+                facilitador: document.getElementById('eventFacilitator').value,
+                invitados: document.getElementById('eventGuests').value.split(',').map(guest => guest.trim())
+            };
+
+            saveEvent(eventData);
+        });
+
+        // Solicitar permiso para notificaciones
+        if (Notification.permission !== 'granted') {
+            Notification.requestPermission();
+        }
+
+        // Inicializar IndexedDB y cargar eventos existentes
+        initDB();
+        fetchEvents();
+    </script>
+
+</body>
+</html>
