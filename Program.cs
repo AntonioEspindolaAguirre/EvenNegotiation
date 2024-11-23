@@ -49,9 +49,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddGoogle(options =>
 {
-    options.ClientId = builder.Configuration["GoogleKeys:ClientId"];
-    options.ClientSecret = builder.Configuration["GoogleKeys:ClientSecret"];
-    options.CallbackPath = "/signin-google"; // Usar la ruta por defecto de Google
+  
 
 });
 
