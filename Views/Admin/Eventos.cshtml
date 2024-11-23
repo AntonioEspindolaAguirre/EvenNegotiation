@@ -1,7 +1,6 @@
 ﻿@{
     Layout = "~/Views/Shared/_AdminsLayout.cshtml";
     ViewData["Title"] = "Eventos";
-
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -13,56 +12,58 @@
 </head>
 <body>
 
-        <div class="row">
-            <!-- Formulario de Registro de Eventos -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">Registrar Evento</h4>
-                        <form id="eventForm">
-                            <div class="mb-3">
-                                <label for="eventName" class="form-label">Nombre del Evento</label>
-                                <input type="text" class="form-control" id="eventName" placeholder="Nombre del Evento" required>
+    <div class="row">
+        <div class="container mt-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4 class="card-title text-center">Registrar Evento</h4>
+                    <form id="eventForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre del Evento</label>
+                                    <input type="text" class="form-control" id="eventName" placeholder="Nombre del Evento" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Fecha y Hora</label>
+                                    <input type="datetime-local" class="form-control" id="eventDate" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Descripción</label>
+                                    <textarea class="form-control" id="eventDescription" rows="3" placeholder="Descripción del Evento"></textarea>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="eventDate" class="form-label">Fecha y Hora</label>
-                                <input type="datetime-local" class="form-control" id="eventDate" required>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Ubicación</label>
+                                    <input type="text" class="form-control" id="eventLocation" placeholder="Ubicación" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Duración (HH:MM)</label>
+                                    <input type="time" class="form-control" id="eventDuration" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Facilitador</label>
+                                    <input type="text" class="form-control" id="eventFacilitator" placeholder="Facilitador" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Invitados (Correos separados por comas)</label>
+                                    <input type="text" class="form-control" id="eventGuests" placeholder="Invitados" required>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="eventLocation" class="form-label">Ubicación</label>
-                                <input type="text" class="form-control" id="eventLocation" placeholder="Ubicación" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="eventDescription" class="form-label">Descripción</label>
-                                <textarea class="form-control" id="eventDescription" rows="3" placeholder="Descripción del Evento"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="eventDuration" class="form-label">Duración (HH:MM)</label>
-                                <input type="time" class="form-control" id="eventDuration" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="eventFacilitator" class="form-label">Facilitador</label>
-                                <input type="text" class="form-control" id="eventFacilitator" placeholder="Facilitador" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="eventGuests" class="form-label">Invitados (Correos separados por comas)</label>
-                                <input type="text" class="form-control" id="eventGuests" placeholder="Invitados" required>
-                            </div>
+                        </div>
+                        <div class="text-center">
                             <button type="submit" class="btn btn-primary">Registrar Evento</button>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
             </div>
 
-            <!-- Lista de Eventos -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">Eventos Registrados</h4>
-                        <ul id="eventList" class="list-group">
-                            <!-- Los eventos registrados aparecerán aquí -->
-                        </ul>
-                    </div>
+            <!-- Eventos Registrados -->
+            <div>
+                <h4 class="text-center">Eventos Registrados</h4>
+                <div class="row g-4" id="eventCards">
+                    <!-- Las tarjetas se agregarán dinámicamente aquí -->
                 </div>
             </div>
         </div>
@@ -98,7 +99,7 @@
 
                 addRequest.onsuccess = () => {
                     sendNotification('Evento Registrado', `El evento "${eventData.nombre}" ha sido registrado exitosamente.`);
-                    addEventToList(eventData);
+                    addEventCard(eventData);
                 };
 
                 addRequest.onerror = (error) => {
@@ -107,13 +108,25 @@
             };
         };
 
-        // Función para mostrar un evento en la lista
-        const addEventToList = (eventData) => {
-            const eventList = document.getElementById('eventList');
-            const listItem = document.createElement('li');
-            listItem.className = 'list-group-item';
-            listItem.textContent = `${eventData.nombre} - ${eventData.fecha}`;
-            eventList.appendChild(listItem);
+        // Función para agregar un evento como tarjeta con el estilo solicitado
+        const addEventCard = (eventData) => {
+            const eventCardsContainer = document.getElementById('eventCards');
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'col-md-6';  // Se asegura de que cada tarjeta ocupe la mitad del ancho
+            cardDiv.innerHTML = `
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4 class="card-title">${eventData.nombre}</h4>
+                                <p class="card-description"><strong>Fecha y Hora:</strong> ${eventData.fecha}</p>
+                                <p><strong>Ubicación:</strong> ${eventData.ubicacion}</p>
+                                <p><strong>Descripción:</strong> ${eventData.descripcion}</p>
+                                <p><strong>Duración:</strong> ${eventData.duracion}</p>
+                                <p><strong>Facilitador:</strong> ${eventData.facilitador}</p>
+                                <p><strong>Invitados:</strong> ${eventData.invitados.join(', ')}</p>
+                            </div>
+                        </div>
+                    `;
+            eventCardsContainer.appendChild(cardDiv);
         };
 
         // Función para cargar los eventos ya registrados
@@ -128,7 +141,7 @@
 
                 getAllRequest.onsuccess = () => {
                     const events = getAllRequest.result;
-                    events.forEach(eventData => addEventToList(eventData));
+                    events.forEach(eventData => addEventCard(eventData));
                 };
 
                 getAllRequest.onerror = (error) => {

@@ -1,59 +1,77 @@
 ﻿@{
-    ViewData["Title"] = "Dashboard";
-}
-
-@{
     Layout = "~/Views/Shared/_AdminsLayout.cshtml";
+    ViewData["Title"] = "Eventos";
 }
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Usuario</title>
-    <!-- Aquí puedes agregar Bootstrap o tu framework CSS preferido -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="row">
-            <!-- Formulario de Registro -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">Registrar Usuario</h4>
-                        <form id="registrationForm">
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Nombre de Usuario</label>
-                                <input type="text" class="form-control" id="username" placeholder="Nombre de Usuario" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Correo Electrónico</label>
-                                <input type="email" class="form-control" id="email" placeholder="Correo Electrónico" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Contraseña</label>
-                                <input type="password" class="form-control" id="password" placeholder="Contraseña" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
-                                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirmar Contraseña" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Registrar</button>
-                        </form>
-                    </div>
+    <div class="row">
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Registrar Usuario</h4>
+                    <form class="forms-sample material-form" id="registrationForm">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="fullName" required="required">
+                            <label for="fullName" class="control-label">Nombre Completo</label><i class="bar"></i>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="username" required="required">
+                            <label for="username" class="control-label">Nombre de Usuario</label><i class="bar"></i>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="email" required="required">
+                            <label for="email" class="control-label">Correo Electrónico</label><i class="bar"></i>
+                        </div>
+                        <div class="form-group" data-select2-id="7">
+                            <label for="role">Seleccionar Rol</label>
+                            <select class="js-example-basic-single w-100" id="role" required="required">
+                                <option value="admin">Administrador</option>
+                                <option value="facilitator">Facilitador</option>
+                                <option value="participant">Participante</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" id="password" required="required">
+                            <label for="password" class="control-label">Contraseña</label><i class="bar"></i>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" id="confirmPassword" required="required">
+                            <label for="confirmPassword" class="control-label">Confirmar Contraseña</label><i class="bar"></i>
+                        </div>
+                      
+                        <div class="button-container">
+                            <button type="submit" class="btn btn-primary btn-block"><span>Registrar</span></button>
+                        </div>
+                    </form>
                 </div>
             </div>
+        </div>
 
-            <!-- Lista de Usuarios -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">Usuarios Registrados</h4>
-                        <ul id="userIdsList" class="list-group">
-                            <!-- Los IDs de usuarios registrados aparecerán aquí -->
-                        </ul>
+        <!-- Lista de Usuarios Registrados -->
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Usuarios Registrados</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nombre de Usuario</th>
+                                    <th>Correo Electrónico</th>
+                                    <th>Rol</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userIdsList">
+                                <!-- Los usuarios registrados aparecerán aquí dinámicamente -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -95,7 +113,7 @@
 
                 addRequest.onsuccess = () => {
                     sendNotification('Usuario Registrado', `El usuario ${userData.nombre} ha sido registrado exitosamente.`);
-                    addUserIdToList(userData.email); // Agregar ID (email) a la lista
+                    addUserToList(userData); // Agregar usuario a la lista
                 };
 
                 addRequest.onerror = (error) => {
@@ -108,13 +126,16 @@
             };
         };
 
-        // Función para agregar ID a la lista en la página
-        const addUserIdToList = (id) => {
+        // Función para agregar un usuario a la lista
+        const addUserToList = (userData) => {
             const userIdsList = document.getElementById('userIdsList');
-            const listItem = document.createElement('li');
-            listItem.className = 'list-group-item';
-            listItem.textContent = id; // Mostrar el ID (email en este caso)
-            userIdsList.appendChild(listItem);
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                                <td>${userData.username}</td>
+                                <td>${userData.email}</td>
+                                <td>${userData.rol}</td>
+                            `;
+            userIdsList.appendChild(row);
         };
 
         // Función para cargar usuarios ya registrados
@@ -125,7 +146,7 @@
 
             request.onsuccess = () => {
                 const users = request.result;
-                users.forEach(user => addUserIdToList(user.email));
+                users.forEach(user => addUserToList(user));
             };
 
             request.onerror = (error) => {
@@ -151,8 +172,10 @@
             e.preventDefault();
 
             const username = document.getElementById('username').value;
+            const fullName = document.getElementById('fullName').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
 
             if (password !== document.getElementById('confirmPassword').value) {
                 alert('Las contraseñas no coinciden');
@@ -160,9 +183,11 @@
             }
 
             const userData = {
-                nombre: username,
+                nombre: fullName,
+                username: username,
                 email: email,
-                password: password
+                password: password,
+                rol: role
             };
 
             saveUser(userData);
